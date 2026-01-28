@@ -1,0 +1,86 @@
+package com.teammors.server.im.handler.impl;
+
+import com.alibaba.fastjson.JSON;
+import com.teammors.server.im.entity.Message;
+import com.teammors.server.im.handler.EventHandler;
+import com.teammors.server.im.model.GroupMember;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.UUID;
+
+@Component
+public class CreateGroupHandler implements EventHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(CreateGroupHandler.class);
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @Override
+    public String getEventId() {
+        return "5000001";
+    }
+
+    @Override
+    public void handle(ChannelHandlerContext ctx, Message msg) {
+        String fromUid = msg.getFromUid();
+        String dataBody = msg.getDataBody();
+
+        try {
+            // 1. Parse member list
+            List<GroupMember> members = JSON.parseArray(dataBody, GroupMember.class);
+            if (members == null || members.isEmpty()) {
+                log.warn("Create group failed: Empty member list from user {}", fromUid);
+                sendResponse(ctx, msg, "5000001", "Fail: Empty members");
+                return;
+            }
+
+            // 2. Generate Group ID
+            String groupId = UUID.randomUUID().toString().replace("-", "");
+
+            // 3. Store Group Info to Redis
+            // Key: "group:info:{groupId}" -> HashKey: "userId" -> Value: "isAdmin" (or JSON)
+            // Storing member list in a Hash for easy lookup/modification
+            String groupKey = "group:info:" + groupId;
+            
+            for (GroupMember member : members) {
+                // We use userId as hash key and isAdmin status as value
+                redisTemplate.opsForHash().put(groupKey, member.getUserId(), member.getIsAdmin());
+                
+                // Also maintain a reverse index: "user:groups:{userId}" -> Set<groupId>
+                redisTemplate.opsForSet().add("user:groups:" + member.getUserId(), groupId);
+            }
+
+            log.info("Group created successfully. GroupId: {}, Creator: {}, Members: {}", groupId, fromUid, members.size());
+
+            // 4. Respond with Group ID
+            // We reuse the original message structure but put groupId in dataBody or a specific field
+            // For now, let's put it in dataBody as a JSON
+            String responseBody = JSON.toJSONString(java.util.Map.of("groupId", groupId));
+            sendResponse(ctx, msg, "5000001", responseBody);
+
+        } catch (Exception e) {
+            log.error("Error creating group for user {}", fromUid, e);
+            sendResponse(ctx, msg, "5000001", "Fail: System Error");
+        }
+    }
+
+    private void sendResponse(ChannelHandlerContext ctx, Message originalMsg, String eventId, String body) {
+        Message resp = new Message();
+        resp.setEventId(eventId);
+        resp.setFromUid("SYSTEM");
+        resp.setToUid(originalMsg.getFromUid());
+        resp.setDataBody(body);
+        resp.setsTimest(String.valueOf(System.currentTimeMillis()));
+        resp.setIsCache("0");
+        
+        ctx.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resp)));
+    }
+}
