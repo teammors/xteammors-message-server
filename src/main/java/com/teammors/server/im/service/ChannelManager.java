@@ -103,6 +103,9 @@ public class ChannelManager {
      * @return String <>uid</>
      */
     public String getUserIdByChannelId(String channelId) {
-        return userIdMaps.get(channelId);
+        if(userIdMaps.containsKey(channelId)){
+            return userIdMaps.get(channelId);
+        }
+        return null;
     }
 }

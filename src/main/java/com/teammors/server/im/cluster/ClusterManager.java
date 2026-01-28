@@ -3,6 +3,7 @@ package com.teammors.server.im.cluster;
 import com.alibaba.fastjson.JSON;
 import com.teammors.server.im.entity.Message;
 import com.teammors.server.im.service.ChannelManager;
+import com.teammors.server.im.service.MessageSender;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.slf4j.Logger;
@@ -53,11 +54,16 @@ public class ClusterManager implements MessageListener {
     @Autowired
     private ChannelManager channelManager;
 
+    @Autowired
+    private MessageSender messageSender;
+
     private final String instanceId = UUID.randomUUID().toString();
     private final String topicName = "im-cluster-topic";
     
     // Stream listener executor
     private final ExecutorService streamListenerExecutor = Executors.newSingleThreadExecutor();
+    // Virtual Thread Executor for dispatching stream messages
+    private final ExecutorService streamTaskExecutor = Executors.newVirtualThreadPerTaskExecutor();
     private volatile boolean isRunning = true;
     
     public String getInstanceId() {
@@ -98,9 +104,6 @@ public class ClusterManager implements MessageListener {
         // Note: Actual session cleanup is handled by channel inactive events during server stop,
         // or by the dead instance cleaner if we crash hard.
     }
-    
-    // Virtual Thread Executor for dispatching stream messages
-    private final ExecutorService streamTaskExecutor = Executors.newVirtualThreadPerTaskExecutor();
     
     private void listenStream() {
         while (isRunning) {
@@ -182,7 +185,7 @@ public class ClusterManager implements MessageListener {
                 log.debug("Received forwarded message for user {}, sending to local channels", toUid);
                 for (Channel channel : userChannels.values()) {
                     if (channel.isActive()) {
-                        channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
+                        messageSender.send(channel, msg); // Use MessageSender
                     }
                 }
             } else {

@@ -34,7 +34,9 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
         //If it is encrypted, it needs to be decrypted first.
         if(!XJSONUtils.isJsonFast(text)){
             String uid = channelManager.getUserIdByChannelId(ctx.channel().id().asLongText());
-            text = SecurityUtil.decrypt(SecurityUtil.getUidKey(uid), text);
+            if(uid != null){
+                text = SecurityUtil.decrypt(SecurityUtil.getUidKey(uid), text);
+            }
         }
 
 

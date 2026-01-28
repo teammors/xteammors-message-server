@@ -6,9 +6,9 @@ import com.teammors.server.im.entity.Message;
 import com.teammors.server.im.handler.EventHandler;
 import com.teammors.server.im.model.UserSessionInfo;
 import com.teammors.server.im.service.ChannelManager;
+import com.teammors.server.im.service.MessageSender;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +32,9 @@ public class PrivateMessageHandler implements EventHandler {
 
     @Autowired
     private ClusterManager clusterManager;
+    
+    @Autowired
+    private MessageSender messageSender;
 
     @Override
     public String getEventId() {
@@ -49,14 +52,8 @@ public class PrivateMessageHandler implements EventHandler {
         if (userChannels != null && !userChannels.isEmpty()) {
             for (Channel channel : userChannels.values()) {
                 if (channel.isActive()) {
-                    // Store unacked message to Redis (ACK Mechanism)
-                    // Key: ack:msg:{userId}  HashKey: sTimest  Value: MessageJSON
-                    String sTimest = msg.getsTimest();
-                    if (sTimest != null && !sTimest.isEmpty()) {
-                         redisTemplate.opsForHash().put("ack:msg:" + toUid, sTimest, JSON.toJSONString(msg));
-                    }
-                    
-                    channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
+                    // Send and cache for ACK
+                    messageSender.sendAndCache(channel, msg);
                     sentLocally = true;
                 }
             }

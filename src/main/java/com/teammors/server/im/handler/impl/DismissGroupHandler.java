@@ -3,6 +3,7 @@ package com.teammors.server.im.handler.impl;
 import com.alibaba.fastjson.JSON;
 import com.teammors.server.im.entity.Message;
 import com.teammors.server.im.handler.EventHandler;
+import com.teammors.server.im.service.MessageSender;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.slf4j.Logger;
@@ -23,6 +24,9 @@ public class DismissGroupHandler implements EventHandler {
     
     @Autowired
     private GroupMessageHandler groupMessageHandler;
+
+    @Autowired
+    MessageSender messageSender;
 
     @Override
     public String getEventId() {
@@ -116,14 +120,6 @@ public class DismissGroupHandler implements EventHandler {
     }
 
     private void sendResponse(ChannelHandlerContext ctx, Message originalMsg, String eventId, String body) {
-        Message resp = new Message();
-        resp.setEventId(eventId);
-        resp.setFromUid("SYSTEM");
-        resp.setToUid(originalMsg.getFromUid());
-        resp.setDataBody(body);
-        resp.setsTimest(String.valueOf(System.currentTimeMillis()));
-        resp.setIsCache("0");
-        
-        ctx.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resp)));
+        messageSender.sendResponse(ctx,originalMsg,eventId,body);
     }
 }

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.teammors.server.im.entity.Message;
 import com.teammors.server.im.handler.EventHandler;
 import com.teammors.server.im.service.IMService;
+import com.teammors.server.im.service.MessageSender;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.slf4j.Logger;
@@ -26,6 +27,9 @@ public class PingHandler implements EventHandler {
     @Autowired
     @org.springframework.context.annotation.Lazy
     private IMService imService;
+    
+    @Autowired
+    private MessageSender messageSender;
 
     @Override
     public String getEventId() {
@@ -35,10 +39,7 @@ public class PingHandler implements EventHandler {
     @Override
     public void handle(ChannelHandlerContext ctx, Message msg) {
         // 1. Respond PONG
-        Message pong = new Message();
-        pong.setEventId("9000000");
-        pong.setDataBody("PONG");
-        ctx.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(pong)));
+        messageSender.sendResponse(ctx, "9000000", null, null, "PONG");
         
         // 2. Check unacked messages (Async)
         String fromUid = msg.getFromUid();
@@ -51,7 +52,6 @@ public class PingHandler implements EventHandler {
         String ackKey = "ack:msg:" + uid;
         try {
             // Get all unacked messages
-            // Using entries() to get both timestamp (key) and message (value)
             Map<Object, Object> unackedMsgs = redisTemplate.opsForHash().entries(ackKey);
             
             if (unackedMsgs != null && !unackedMsgs.isEmpty()) {
@@ -67,8 +67,9 @@ public class PingHandler implements EventHandler {
                         // Check if timeout exceeded
                         if (now - sTimest > RETRY_TIMEOUT_MS) {
                             if (ctx.channel().isActive()) {
+                                Message resendMsg = JSON.parseObject(msgJson, Message.class);
                                 log.debug("Resending timed-out message to user {}, timest: {}", uid, sTimest);
-                                ctx.writeAndFlush(new TextWebSocketFrame(msgJson));
+                                messageSender.send(ctx, resendMsg); // Already cached, just send
                             } else {
                                 return;
                             }

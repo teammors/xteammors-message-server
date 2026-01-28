@@ -7,8 +7,8 @@ import com.teammors.server.im.cluster.ClusterManager;
 import com.teammors.server.im.model.UserSessionInfo;
 import com.teammors.server.im.service.ChannelManager;
 import com.teammors.server.im.service.IMService;
+import com.teammors.server.im.service.MessageSender;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -33,6 +32,9 @@ public class LoginHandler implements EventHandler {
 
     @Autowired
     private ClusterManager clusterManager;
+    
+    @Autowired
+    private MessageSender messageSender;
 
     @Autowired
     @org.springframework.context.annotation.Lazy
@@ -79,7 +81,6 @@ public class LoginHandler implements EventHandler {
             sendResponse(ctx, "1000000", "Success");
             
             // 2. Async offline & unacked message retrieval and push
-            String finalDeviceId = deviceId;
             imService.executeAsync(() -> {
                 pushOfflineMessages(ctx, uid);
                 pushUnackedMessages(ctx, uid);
@@ -101,8 +102,9 @@ public class LoginHandler implements EventHandler {
                 log.info("Resending {} unacked messages for user {}", unackedMsgs.size(), uid);
                 for (Object msgJsonObj : unackedMsgs.values()) {
                     String msgJson = (String) msgJsonObj;
+                    Message msg = JSON.parseObject(msgJson, Message.class);
                     if (ctx.channel().isActive()) {
-                        ctx.writeAndFlush(new TextWebSocketFrame(msgJson));
+                        messageSender.send(ctx, msg); // Already cached, just send
                     } else {
                         return;
                     }
@@ -115,21 +117,15 @@ public class LoginHandler implements EventHandler {
 
     private void pushOfflineMessages(ChannelHandlerContext ctx, String uid) {
         String key = "offline:msg:" + uid;
-        long total = 0;
         try {
             Long size = redisTemplate.opsForList().size(key);
             if (size != null && size > 0) {
-                total = size;
                 log.info("Start pushing {} offline messages for user {}", size, uid);
                 
                 int batchSize = 200;
                 long count = 0;
                 
                 while (true) {
-                    // Pop messages from right (assuming RPUSH was used to add)
-                    // We use LPOP to get the oldest message first if we want FIFO
-                    // Assuming RPUSH was used: Head is oldest, Tail is newest. 
-                    // To get oldest first: LPOP
                     List<String> messages = redisTemplate.opsForList().range(key, 0, batchSize - 1);
                     if (messages == null || messages.isEmpty()) {
                         break;
@@ -139,11 +135,11 @@ public class LoginHandler implements EventHandler {
                     redisTemplate.opsForList().trim(key, messages.size(), -1);
                     
                     for (String jsonMsg : messages) {
+                        Message msg = JSON.parseObject(jsonMsg, Message.class);
                         if (ctx.channel().isActive()) {
-                            ctx.writeAndFlush(new TextWebSocketFrame(jsonMsg));
+                            // For offline messages, we should cache them for ACK now that we are sending them
+                            messageSender.sendAndCache(ctx, msg);
                         } else {
-                            // Channel closed, stop pushing and maybe push back to redis? 
-                            // For simplicity, we abort. In prod, we might need to handle data loss or requeue.
                             log.warn("Channel closed during offline message push for user {}", uid);
                             return;
                         }
@@ -171,10 +167,6 @@ public class LoginHandler implements EventHandler {
     }
 
     private void sendResponse(ChannelHandlerContext ctx, String eventId, String body) {
-        Message resp = new Message();
-        resp.setEventId(eventId);
-        resp.setDataBody(body);
-        resp.setsTimest(String.valueOf(System.currentTimeMillis()));
-        ctx.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(resp)));
+        messageSender.sendResponse(ctx, eventId, "SYSTEM", null, body);
     }
 }
