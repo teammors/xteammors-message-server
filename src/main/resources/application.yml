@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 9201
 
 spring:
   application:
@@ -22,4 +22,4 @@ spring:
           max-wait: -1ms
 
 netty:
-  port: 8088
+  port: 9922

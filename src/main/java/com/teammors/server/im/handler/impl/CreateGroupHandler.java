@@ -26,6 +26,9 @@ public class CreateGroupHandler implements EventHandler {
     @Autowired
     MessageSender messageSender;
 
+    @Autowired
+    private GroupMessageHandler groupMessageHandler;
+
     @Override
     public String getEventId() {
         return "5000001";
@@ -46,28 +49,38 @@ public class CreateGroupHandler implements EventHandler {
             }
 
             // 2. Generate Group ID
-            String groupId = UUID.randomUUID().toString().replace("-", "");
+            String groupId = msg.getGroupId();
 
             // 3. Store Group Info to Redis
-            // Key: "group:info:{groupId}" -> HashKey: "userId" -> Value: "isAdmin" (or JSON)
-            // Storing member list in a Hash for easy lookup/modification
             String groupKey = "group:info:" + groupId;
             
             for (GroupMember member : members) {
-                // We use userId as hash key and isAdmin status as value
                 redisTemplate.opsForHash().put(groupKey, member.getUserId(), member.getIsAdmin());
-                
-                // Also maintain a reverse index: "user:groups:{userId}" -> Set<groupId>
                 redisTemplate.opsForSet().add("user:groups:" + member.getUserId(), groupId);
             }
 
             log.info("Group created successfully. GroupId: {}, Creator: {}, Members: {}", groupId, fromUid, members.size());
 
             // 4. Respond with Group ID
-            // We reuse the original message structure but put groupId in dataBody or a specific field
-            // For now, let's put it in dataBody as a JSON
             String responseBody = JSON.toJSONString(java.util.Map.of("groupId", groupId));
             sendResponse(ctx, msg, "5000001", responseBody);
+            
+            // 5. Notify all initial members
+            Message notifyMsg = new Message();
+            notifyMsg.setEventId("5000004"); // Use Group Message Event ID
+            notifyMsg.setFromUid("SYSTEM");
+            notifyMsg.setGroupId(groupId);
+            notifyMsg.setIsGroup("1");
+            notifyMsg.setDataBody(JSON.toJSONString(java.util.Map.of(
+                "type", "GROUP_CREATED",
+                "groupId", groupId,
+                "creator", fromUid,
+                "timestamp", System.currentTimeMillis()
+            )));
+            notifyMsg.setsTimest(String.valueOf(System.currentTimeMillis()));
+            notifyMsg.setIsCache("0"); // System notification usually not cached or handle separately
+            
+            groupMessageHandler.handle(ctx, notifyMsg);
 
         } catch (Exception e) {
             log.error("Error creating group for user {}", fromUid, e);

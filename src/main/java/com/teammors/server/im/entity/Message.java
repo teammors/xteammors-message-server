@@ -2,24 +2,23 @@ package com.teammors.server.im.entity;
 
 public class Message {
 
-    private String eventId;//事件ID，参考事件ID文件
+    private String eventId; // Event ID, refer to the Event ID document
 
-    private String fromUid;//发送者ID
-    private String toUid;//接收者ID
+    private String fromUid; // Sender ID
+    private String toUid; // Receiver ID
 
-    private String token;//发送者token
-    private String deviceId = "";//发送者token唯一设备id
+    private String token; // Sender token
+    private String deviceId = ""; // Unique device ID for the sender token
 
+    private String type; // Message type
+    private String cTimest; // Client-side timestamp (when sent)
+    private String sTimest; // Server-side timestamp (when received)
+    private String dataBody; // Message body, can be freely defined, passed as a string format {}
 
-    private String type;//消息类型
-    private String cTimest;//客户端发送时间搓
-    private String sTimest;//服务端接收时间搓
-    private String dataBody;//消息体，可以自由定义，以字符串格式传入{}
+    private String isGroup = "0"; // Whether it is a group message: 1 - group, 0 - personal
+    private String groupId = ""; // Group ID. For messages sent from the client, this cannot coexist with toUid; only one of them can be present at a time
 
-    private String isGroup = "0";//是否群组 1-群组，0-个人
-    private String groupId = "";//群组ID ，对于客户端发送过来的消息，不能和toUid并存，两者只能同时出现一个
-
-    private String isCache = "1";//是否需要存离线 1-需要，0-不需要
+    private String isCache = "1"; // Whether offline storage is required: 1 - required, 0 - not required
 
     public String getEventId() {
         return eventId;

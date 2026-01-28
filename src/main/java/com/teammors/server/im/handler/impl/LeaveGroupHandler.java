@@ -26,6 +26,9 @@ public class LeaveGroupHandler implements EventHandler {
     @Autowired
     MessageSender messageSender;
 
+    @Autowired
+    private GroupMessageHandler groupMessageHandler;
+
     @Override
     public String getEventId() {
         return "5000005";
@@ -61,12 +64,29 @@ public class LeaveGroupHandler implements EventHandler {
                 return;
             }
 
-            // 3. Remove members from Group
+            // 3. Notify remaining members
+            // Note: We already removed the members from Redis, so they won't receive this notification
+            // which is correct behavior (they left).
+            Message notifyMsg = new Message();
+            notifyMsg.setEventId("5000004");
+            notifyMsg.setFromUid("SYSTEM");
+            notifyMsg.setGroupId(groupId);
+            notifyMsg.setIsGroup("1");
+            notifyMsg.setDataBody(JSON.toJSONString(java.util.Map.of(
+                "type", "MEMBER_LEFT",
+                "groupId", groupId,
+                "operator", fromUid,
+                "leftMembers", leavingMembers,
+                "timestamp", System.currentTimeMillis()
+            )));
+            notifyMsg.setsTimest(String.valueOf(System.currentTimeMillis()));
+            notifyMsg.setIsCache("0");
+            
+            groupMessageHandler.handle(ctx, notifyMsg);
+
+            // 4. Remove members from Group
             for (GroupMember member : leavingMembers) {
-                // Remove from group info
                 redisTemplate.opsForHash().delete(groupKey, member.getUserId());
-                
-                // Remove from reverse index: "user:groups:{userId}" -> Set<groupId>
                 redisTemplate.opsForSet().remove("user:groups:" + member.getUserId(), groupId);
             }
 

@@ -26,6 +26,9 @@ public class JoinGroupHandler implements EventHandler {
     @Autowired
     MessageSender messageSender;
 
+    @Autowired
+    private GroupMessageHandler groupMessageHandler;
+
     @Override
     public String getEventId() {
         return "5000002";
@@ -56,8 +59,6 @@ public class JoinGroupHandler implements EventHandler {
             // 2. Parse new member list
             List<GroupMember> newMembers = JSON.parseArray(dataBody, GroupMember.class);
             if (newMembers == null || newMembers.isEmpty()) {
-                // If body is empty, maybe the user themselves want to join?
-                // But per requirement, we parse list from dataBody.
                 log.warn("Join group failed: Empty member list from user {}", fromUid);
                 sendResponse(ctx, msg, "5000002", "Fail: Empty members");
                 return;
@@ -65,16 +66,31 @@ public class JoinGroupHandler implements EventHandler {
 
             // 3. Add members to Group
             for (GroupMember member : newMembers) {
-                // We use userId as hash key and isAdmin status as value
                 redisTemplate.opsForHash().put(groupKey, member.getUserId(), member.getIsAdmin());
-                
-                // Also maintain a reverse index: "user:groups:{userId}" -> Set<groupId>
                 redisTemplate.opsForSet().add("user:groups:" + member.getUserId(), groupId);
             }
 
             log.info("Users joined group {} successfully. Count: {}", groupId, newMembers.size());
 
             sendResponse(ctx, msg, "5000002", "Success");
+            
+            // 4. Notify all group members (including new ones)
+            Message notifyMsg = new Message();
+            notifyMsg.setEventId("5000004");
+            notifyMsg.setFromUid("SYSTEM");
+            notifyMsg.setGroupId(groupId);
+            notifyMsg.setIsGroup("1");
+            notifyMsg.setDataBody(JSON.toJSONString(java.util.Map.of(
+                "type", "MEMBER_JOINED",
+                "groupId", groupId,
+                "inviter", fromUid,
+                "newMembers", newMembers,
+                "timestamp", System.currentTimeMillis()
+            )));
+            notifyMsg.setsTimest(String.valueOf(System.currentTimeMillis()));
+            notifyMsg.setIsCache("0");
+            
+            groupMessageHandler.handle(ctx, notifyMsg);
 
         } catch (Exception e) {
             log.error("Error joining group {} for user {}", groupId, fromUid, e);

@@ -36,7 +36,7 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
         pipeline.addLast(new IdleStateHandler(60, 0, 0, TimeUnit.SECONDS));
         pipeline.addLast(heartbeatHandler);
         
-        pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
+        pipeline.addLast(new WebSocketServerProtocolHandler("/"));
         pipeline.addLast(webSocketHandler);
     }
 }
