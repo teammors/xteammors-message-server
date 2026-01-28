@@ -53,7 +53,7 @@ graph TD
     subgraph "Redis Cluster"
         Session[User Sessions]
         MsgCache[ACK Cache]
-        Stream[Redis Stream (Inter-Node Msg)]
+        Stream["Redis Stream (Inter-Node Msg)"]
     end
     
     Node_1 --"Forward Msg (XADD)"--> Stream
