@@ -40,7 +40,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
         }
 
 
-        log.debug("Received message: {}", text);
+        log.info("Received message: {}", text);
         try {
             Message msg = JSON.parseObject(text, Message.class);
             if (msg != null) {

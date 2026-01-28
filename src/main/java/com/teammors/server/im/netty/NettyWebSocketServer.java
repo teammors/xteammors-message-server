@@ -53,9 +53,28 @@ public class NettyWebSocketServer {
         }).start();
     }
 
-    @PreDestroy
+    // Remove @PreDestroy to control shutdown order manually in IMApplication
     public void stop() {
-        if (bossGroup != null) bossGroup.shutdownGracefully();
-        if (workerGroup != null) workerGroup.shutdownGracefully();
+        log.info("Stopping Netty WebSocket server...");
+        if (bossGroup != null) {
+            try {
+                // Stop accepting new connections immediately
+                bossGroup.shutdownGracefully(0, 5, java.util.concurrent.TimeUnit.SECONDS).sync();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.warn("Netty bossGroup shutdown interrupted");
+            }
+        }
+        if (workerGroup != null) {
+            try {
+                // Close all existing connections and wait
+                // This will trigger channelInactive -> handlerRemoved -> Redis Cleanup
+                workerGroup.shutdownGracefully(0, 5, java.util.concurrent.TimeUnit.SECONDS).sync();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.warn("Netty workerGroup shutdown interrupted");
+            }
+        }
+        log.info("Netty WebSocket server stopped.");
     }
 }
