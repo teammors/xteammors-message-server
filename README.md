@@ -74,8 +74,14 @@ mvn clean package -DskipTests
 
 # Run the server
 java -jar target/im-server-1.0.0.jar
-```
 
+
+# Single-machine multi-instance operation
+java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/xMessaheServer/application9922.yml
+java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/xMessaheServer/application9933.yml
+java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/xMessaheServer/application9944.yml
+
+```
 ---
 
 <a name="chinese"></a>
@@ -130,6 +136,12 @@ mvn clean package -DskipTests
 
 # 启动
 java -jar target/im-server-1.0.0.jar
+
+# 单机多实例运行
+java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/xMessaheServer/application9922.yml
+java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/xMessaheServer/application9933.yml
+java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/xMessaheServer/application9944.yml
+
 ```
 
 ## 📄 License
