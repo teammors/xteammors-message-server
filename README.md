@@ -1,7 +1,8 @@
-# xMessageServer - High Performance Distributed IM Server
+# xMessageServer
+<h3>High Performance Distributed IM Server</h3>
 
-<br align="center">
-  <img src="adimages.jpg" alt="xMessageServer Banner" width="60%" />
+<p align="center">
+  <img src="adimages.png" alt="xMessageServer Banner" width="60%" />
 </p>
 
 ![](https://img.shields.io/badge/JDK-21-blue?logo=java&logoColor=white)
