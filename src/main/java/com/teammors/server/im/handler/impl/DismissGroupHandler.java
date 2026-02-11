@@ -66,7 +66,7 @@ public class DismissGroupHandler implements EventHandler {
             notifyMsg.setFromUid(fromUid);
             notifyMsg.setToUid(groupId);
             notifyMsg.setDataBody("Group has been dismissed by admin.");
-            notifyMsg.setsTimest(String.valueOf(System.currentTimeMillis()));
+            notifyMsg.setSTimest(String.valueOf(System.currentTimeMillis()));
             notifyMsg.setIsCache("0"); // Notification doesn't need to be cached if group is gone
             
             // We use GroupMessageHandler to broadcast.

@@ -77,7 +77,7 @@ public class CreateGroupHandler implements EventHandler {
                 "creator", fromUid,
                 "timestamp", System.currentTimeMillis()
             )));
-            notifyMsg.setsTimest(String.valueOf(System.currentTimeMillis()));
+            notifyMsg.setSTimest(String.valueOf(System.currentTimeMillis()));
             notifyMsg.setIsCache("0"); // System notification usually not cached or handle separately
             
             groupMessageHandler.handle(ctx, notifyMsg);

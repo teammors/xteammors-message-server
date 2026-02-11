@@ -87,7 +87,7 @@ public class JoinGroupHandler implements EventHandler {
                 "newMembers", newMembers,
                 "timestamp", System.currentTimeMillis()
             )));
-            notifyMsg.setsTimest(String.valueOf(System.currentTimeMillis()));
+            notifyMsg.setSTimest(String.valueOf(System.currentTimeMillis()));
             notifyMsg.setIsCache("0");
             
             groupMessageHandler.handle(ctx, notifyMsg);

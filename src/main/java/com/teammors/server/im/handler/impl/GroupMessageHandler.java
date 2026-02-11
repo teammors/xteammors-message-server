@@ -86,7 +86,7 @@ public class GroupMessageHandler implements EventHandler {
                 copyMsg.setFromUid(fromUid);
                 copyMsg.setToUid(memberId);
                 copyMsg.setDataBody(originalMsg.getDataBody());
-                copyMsg.setsTimest(String.valueOf(System.currentTimeMillis()));
+                copyMsg.setSTimest(String.valueOf(System.currentTimeMillis()));
                 copyMsg.setIsCache(originalMsg.getIsCache());
                 copyMsg.setToken(originalMsg.getToken());
                 copyMsg.setGroupId(originalMsg.getGroupId());

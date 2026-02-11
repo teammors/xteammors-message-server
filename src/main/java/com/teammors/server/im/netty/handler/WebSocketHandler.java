@@ -44,7 +44,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
         try {
             Message msg = JSON.parseObject(text, Message.class);
             if (msg != null) {
-                msg.setsTimest(String.valueOf(System.currentTimeMillis()));
+                msg.setSTimest(String.valueOf(System.currentTimeMillis()));
                 imService.handleEvent(ctx, msg);
             }
         } catch (Exception e) {

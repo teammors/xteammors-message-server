@@ -57,7 +57,7 @@ public class MessageSender {
         if (channel != null && channel.isActive()) {
             // Cache for ACK
             String toUid = msg.getToUid();
-            String sTimest = msg.getsTimest();
+            String sTimest = msg.getSTimest();
             
             if (toUid != null && sTimest != null && !sTimest.isEmpty()) {
                 // Key: ack:msg:{userId}  HashKey: sTimest  Value: MessageJSON
@@ -90,7 +90,7 @@ public class MessageSender {
         resp.setFromUid(fromUid != null ? fromUid : "SYSTEM");
         resp.setToUid(toUid);
         resp.setDataBody(body);
-        resp.setsTimest(String.valueOf(System.currentTimeMillis()));
+        resp.setSTimest(String.valueOf(System.currentTimeMillis()));
         resp.setIsCache("0"); // System responses usually don't need caching
         
         send(ctx, resp);
