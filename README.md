@@ -82,6 +82,17 @@ java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/x
 java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/xMessaheServer/application9944.yml
 
 ```
+
+## 📱 Test Clients
+
+We provide open-source client implementations for testing and integration reference:
+
+- **Java Client (CLI)**: [xteammors-message-client-java](https://github.com/teammors/xteammors-message-client-java)
+  - A pure Java WebSocket client with AES encryption and interactive CLI.
+  
+- **Flutter Client (Mobile/Web/Desktop)**: [xteammors-message-client-flutter](https://github.com/teammors/xteammors-message-client-flutter)
+  - A cross-platform Flutter client supporting Android, iOS, macOS, Windows, Linux, and Web.
+
 ---
 
 <a name="chinese"></a>
@@ -144,7 +155,17 @@ java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/x
 
 ```
 
-## 📄 License
+## � 测试客户端
+
+为了方便开发者进行测试和集成，我们提供了开源的客户端实现：
+
+- **Java 客户端 (命令行)**: [xteammors-message-client-java](https://github.com/teammors/xteammors-message-client-java)
+  - 纯 Java 编写的 WebSocket 客户端，支持 AES 加密和交互式命令行操作。
+  
+- **Flutter 客户端 (全平台)**: [xteammors-message-client-flutter](https://github.com/teammors/xteammors-message-client-flutter)
+  - 基于 Flutter 的跨平台客户端，支持 Android、iOS、macOS、Windows、Linux 和 Web。
+
+## �📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
