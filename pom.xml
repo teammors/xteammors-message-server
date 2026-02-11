@@ -13,12 +13,21 @@
 
     <groupId>com.teammors</groupId>
     <artifactId>im-server</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <properties>
+        <!-- 基础环境版本 -->
         <java.version>21</java.version>
-        <netty.version>4.2.10.Final</netty.version>
+
+        <!-- 框架核心版本 -->
+        <spring-boot.version>3.4.5</spring-boot.version>
         <spring-core.version>6.2.11</spring-core.version>
+
+        <!-- 第三方组件版本 -->
+        <netty.version>4.2.10.Final</netty.version>
+        <fastjson.version>1.2.83</fastjson.version>
+        <hutool.version>5.8.40</hutool.version>
+        <logback.version>1.5.25</logback.version>
     </properties>
 
     <!-- 新增：通过 dependencyManagement 强制锁定版本 -->
@@ -27,27 +36,27 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>6.2.11</version>
+                <version>${spring-core.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
-                <version>6.2.11</version>
+                <version>${spring-core.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>6.2.11</version>
+                <version>${spring-core.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>1.5.25</version>
+                <version>${logback.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.5.25</version>
+                <version>${logback.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -81,7 +90,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.83</version>
+            <version>${fastjson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -95,7 +104,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>5.8.40</version>
+            <version>${hutool.version}</version>
         </dependency>
     </dependencies>
 
