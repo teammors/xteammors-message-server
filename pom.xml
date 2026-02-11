@@ -12,8 +12,8 @@
     </parent>
 
     <groupId>com.teammors</groupId>
-    <artifactId>im-server</artifactId>
-    <version>1.0.2</version>
+    <artifactId>xMessage-Server</artifactId>
+    <version>1.0.0</version>
 
     <properties>
         <!-- 基础环境版本 -->
