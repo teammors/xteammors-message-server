@@ -1,5 +1,5 @@
 # xMessageServer
-<h3>High Performance Distributed IM Server</h3>
+<h3>Pure Java high-performance distributed IM server</h3>
 
 <p align="center">
   <img src="adimages.png" alt="xMessageServer Banner" width="60%" />
