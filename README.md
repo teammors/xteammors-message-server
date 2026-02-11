@@ -1,5 +1,17 @@
 # xMessageServer - High Performance Distributed IM Server
 
+<br align="center">
+  <img src="adimages.jpg" alt="xMessageServer Banner" width="60%" />
+</p>
+
+![](https://img.shields.io/badge/JDK-21-blue?logo=java&logoColor=white)
+![](https://img.shields.io/badge/Spring_Boot-3.4.5-green?logo=springboot&logoColor=white)
+![](https://img.shields.io/badge/Netty-4.2.10.Final-red)
+![](https://img.shields.io/badge/Redis-5.0+-red?logo=redis&logoColor=white)
+![](https://img.shields.io/badge/Protocol-Custom_JSON-orange)
+![](https://img.shields.io/badge/License-MIT-blue)
+![](https://img.shields.io/badge/Build-Passing-brightgreen)
+
 [English](#english) | [中文](#chinese)
 
 <a name="english"></a>
@@ -81,6 +93,14 @@ java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/x
 java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/xMessaheServer/application9933.yml
 java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/xMessaheServer/application9944.yml
 
+# Docker Run
+docker build -t xmessage-server:1.0 .
+docker run -d --name xmessage-server-container -p 9922:9922 xmessage-server:1.0
+
+# Docker Run Multi-Instance
+docker run -d --name xmessage-server-1 -p 9922:9922 xmessage-server:1.0
+docker run -d --name xmessage-server-2 -p 9933:9922 xmessage-server:1.0
+docker run -d --name xmessage-server-3 -p 9944:9922 xmessage-server:1.0
 ```
 
 ## 📱 Test Clients
@@ -153,6 +173,14 @@ java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/x
 java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/xMessaheServer/application9933.yml
 java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/xMessaheServer/application9944.yml
 
+# Docker 运行
+docker build -t xmessage-server:1.0 .
+docker run -d --name xmessage-server-container -p 9922:9922 xmessage-server:1.0
+
+# Docker 单机多实例
+docker run -d --name xmessage-server-1 -p 9922:9922 xmessage-server:1.0
+docker run -d --name xmessage-server-2 -p 9933:9922 xmessage-server:1.0
+docker run -d --name xmessage-server-3 -p 9944:9922 xmessage-server:1.0
 ```
 
 ## � 测试客户端
@@ -165,7 +193,7 @@ java -jar im-server-1.0.0.jar --spring.config.location=file:/Users/dev/Desktop/x
 - **Flutter 客户端 (全平台)**: [xteammors-message-client-flutter](https://github.com/teammors/xteammors-message-client-flutter)
   - 基于 Flutter 的跨平台客户端，支持 Android、iOS、macOS、Windows、Linux 和 Web。
 
-## �📄 License
+## �� License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
