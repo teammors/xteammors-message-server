@@ -19,7 +19,7 @@
 
 ## 🚀 Introduction
 
-xMessageServer is a cloud-native, high-performance distributed Instant Messaging (IM) server designed to handle **millions of concurrent connections (C1000K)**. Built on **Netty** and **Spring Boot**, it leverages the power of **JDK 21 Virtual Threads** and **Redis Stream** to provide a robust, scalable, and low-latency messaging infrastructure.
+xMessageServer is a pure Java, cloud-native, high-performance distributed Instant Messaging (IM) server designed to handle **millions of concurrent connections (C1000K)**. Built on **Netty** and **Spring Boot**, it leverages the power of **JDK 21 Virtual Threads** and **Redis Stream** to provide a robust, scalable, and low-latency messaging infrastructure.
 
 Whether for private chats, massive group chats, or cross-region communication, xMessageServer delivers carrier-grade stability and message reliability (QoS 1).
 
@@ -120,7 +120,7 @@ We provide open-source client implementations for testing and integration refere
 
 ## 🚀 项目介绍
 
-xMessageServer 是一个云原生、高性能的分布式即时通讯（IM）服务端，专为处理**百万级并发连接 (C1000K)** 而设计。基于 **Netty** 和 **Spring Boot** 构建，充分利用 **JDK 21 虚拟线程** 和 **Redis Stream** 的特性，提供稳健、可扩展且低延迟的消息基础设施。
+xMessageServer 是一个纯Java、云原生、高性能的分布式即时通讯（IM）服务端，专为处理**百万级并发连接 (C1000K)** 而设计。基于 **Netty** 和 **Spring Boot** 构建，充分利用 **JDK 21 虚拟线程** 和 **Redis Stream** 的特性，提供稳健、可扩展且低延迟的消息基础设施。
 
 无论是单聊、万人群聊，还是跨地域通信，xMessageServer 都能提供电信级的稳定性和消息可靠性 (QoS 1)。
 
