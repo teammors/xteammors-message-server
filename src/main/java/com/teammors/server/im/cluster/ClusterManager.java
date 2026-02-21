@@ -227,7 +227,7 @@ public class ClusterManager implements MessageListener {
                 // Check if this instance is still alive (has heartbeat key)
                 Boolean isAlive = redisTemplate.hasKey(KEY_HEARTBEAT_PREFIX + deadInstanceId);
                 
-                if (Boolean.FALSE.equals(isAlive)) {
+                if (!isAlive) {
                     log.warn("Detected DEAD instance: {}. Starting session cleanup...", deadInstanceId);
                     cleanUpDeadInstance(deadInstanceId, key);
                 }

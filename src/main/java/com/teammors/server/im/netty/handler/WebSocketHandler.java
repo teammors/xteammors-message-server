@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 @ChannelHandler.Sharable
 public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
@@ -39,14 +41,15 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
             }
         }
 
-
-        log.info("Received message: {}", text);
         try {
+
             Message msg = JSON.parseObject(text, Message.class);
-            if (msg != null) {
-                msg.setSTimest(String.valueOf(System.currentTimeMillis()));
-                imService.handleEvent(ctx, msg);
+            if(!Objects.equals(msg.getEventId(), "9000000")){
+                log.info("Received message: {}", text);
             }
+            msg.setSTimest(String.valueOf(System.currentTimeMillis()));
+            imService.handleEvent(ctx, msg);
+
         } catch (Exception e) {
             log.error("Failed to parse message", e);
         }

@@ -46,8 +46,8 @@ public class DismissGroupHandler implements EventHandler {
 
         try {
             // 1. Check permission (Is Admin/Owner?)
-            String groupKey = "group:info:" + groupId;
-            Object roleObj = redisTemplate.opsForHash().get(groupKey, fromUid);
+            //String groupKey = groupId;
+            Object roleObj = redisTemplate.opsForHash().get(groupId, fromUid);
             
             if (roleObj == null) {
                 sendResponse(ctx, msg, "5000003", "Fail: Not a member");
@@ -100,7 +100,7 @@ public class DismissGroupHandler implements EventHandler {
             // No need, it's synchronous up to the point of fetching keys.
             // However, let's be safer and fetch members here for cleanup anyway.
             
-            Set<Object> memberIds = redisTemplate.opsForHash().keys(groupKey);
+            Set<Object> memberIds = redisTemplate.opsForHash().keys(groupId);
             for (Object memberIdObj : memberIds) {
                 String memberId = (String) memberIdObj;
                 // Remove from reverse index
@@ -108,7 +108,7 @@ public class DismissGroupHandler implements EventHandler {
             }
 
             // Delete Group Key
-            redisTemplate.delete(groupKey);
+            redisTemplate.delete(groupId);
             
             log.info("Group {} dismissed by {}", groupId, fromUid);
             sendResponse(ctx, msg, "5000003", "Success");

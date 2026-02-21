@@ -48,8 +48,8 @@ public class LeaveGroupHandler implements EventHandler {
 
         try {
             // 1. Check if group exists
-            String groupKey = "group:info:" + groupId;
-            Boolean hasKey = redisTemplate.hasKey(groupKey);
+            //String groupKey = groupId;
+            Boolean hasKey = redisTemplate.hasKey(groupId);
             if (!hasKey) {
                 log.warn("Leave group failed: Group {} not found", groupId);
                 sendResponse(ctx, msg, "5000005", "Fail: Group Not Found");
@@ -86,7 +86,7 @@ public class LeaveGroupHandler implements EventHandler {
 
             // 4. Remove members from Group
             for (GroupMember member : leavingMembers) {
-                redisTemplate.opsForHash().delete(groupKey, member.getUserId());
+                redisTemplate.opsForHash().delete(groupId, member.getUserId());
                 redisTemplate.opsForSet().remove("user:groups:" + member.getUserId(), groupId);
             }
 

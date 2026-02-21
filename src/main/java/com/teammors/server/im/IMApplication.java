@@ -21,6 +21,7 @@ public class IMApplication implements ApplicationListener<ContextClosedEvent> {
 
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
+
         // This event is fired when the ApplicationContext is closed, 
         // but BEFORE beans are destroyed (mostly).
         // However, standard bean destruction order is not guaranteed relative to this listener

@@ -48,8 +48,8 @@ public class JoinGroupHandler implements EventHandler {
 
         try {
             // 1. Check if group exists
-            String groupKey = "group:info:" + groupId;
-            Boolean hasKey = redisTemplate.hasKey(groupKey);
+            //String groupKey = groupId;
+            Boolean hasKey = redisTemplate.hasKey(groupId);
             if (!hasKey) {
                 log.warn("Join group failed: Group {} not found", groupId);
                 sendResponse(ctx, msg, "5000002", "Fail: Group Not Found");
@@ -66,7 +66,7 @@ public class JoinGroupHandler implements EventHandler {
 
             // 3. Add members to Group
             for (GroupMember member : newMembers) {
-                redisTemplate.opsForHash().put(groupKey, member.getUserId(), member.getIsAdmin());
+                redisTemplate.opsForHash().put(groupId, member.getUserId(), member.getIsAdmin());
                 redisTemplate.opsForSet().add("user:groups:" + member.getUserId(), groupId);
             }
 

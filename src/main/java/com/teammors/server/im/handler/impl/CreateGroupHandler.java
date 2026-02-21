@@ -52,10 +52,10 @@ public class CreateGroupHandler implements EventHandler {
             String groupId = msg.getGroupId();
 
             // 3. Store Group Info to Redis
-            String groupKey = "group:info:" + groupId;
+            //String groupKey = groupId;
             
             for (GroupMember member : members) {
-                redisTemplate.opsForHash().put(groupKey, member.getUserId(), member.getIsAdmin());
+                redisTemplate.opsForHash().put(groupId, member.getUserId(), member.getIsAdmin());
                 redisTemplate.opsForSet().add("user:groups:" + member.getUserId(), groupId);
             }
 

@@ -53,8 +53,8 @@ public class GroupMessageHandler implements EventHandler {
 
         // 1. Get all group members
         // Key: "group:info:{groupId}"
-        String groupKey = "group:info:" + groupId;
-        Set<Object> memberIdsSet = redisTemplate.opsForHash().keys(groupKey);
+        //String groupKey = groupId;
+        Set<Object> memberIdsSet = redisTemplate.opsForHash().keys(groupId);
         
         if (memberIdsSet == null || memberIdsSet.isEmpty()) {
             log.warn("Group message failed: Group {} not found or empty", groupId);
